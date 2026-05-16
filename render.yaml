@@ -7,33 +7,11 @@ services:
     env: node
     region: Mumbai
     plan: starter
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    buildCommand: npm install
+    startCommand: node index.js
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: '4059'
-      - key: MONGODB_URI
-        sync: false
-      - key: REDIS_URL
-        sync: false
-      - key: INTERNAL_SERVICE_TOKEN
-        sync: false
-      - key: MERCHANT_SERVICE_URL
-        fromService:
-          - id: <merchant-service-id>
-            envVar: URL
-      - key: MERCHANT_INTELLIGENCE_URL
-        value: https://rez-intelligence.rezapp.com
-      - key: AD_AI_URL
-        value: https://rez-adai.rezapp.com
-      - key: ENGAGEMENT_URL
-        value: https://rez-engagement.rezapp.com
-      - key: NOTIFICATION_SERVICE_URL
-        value: https://rez-notifications.rezapp.com
-      - key: WALLET_SERVICE_URL
-        value: https://rez-wallet.rezapp.com
-      - key: PAYMENT_SERVICE_URL
-        value: https://rez-payment.rezapp.com
