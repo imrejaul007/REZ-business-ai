@@ -125,6 +125,40 @@ function recordAction(action, result) {
 
 // ============== API ROUTES ==============
 
+// ============== VOICE COMMANDS ==============
+
+const { parseCommand, executeCommand } = require('./src/services/voiceCommands');
+
+app.post('/api/voice/command', (req, res) => {
+  const { text } = req.body;
+  if (!text) {
+    return res.status(400).json({ error: 'text required' });
+  }
+  const command = parseCommand(text);
+  const result = executeCommand(command);
+  res.json({ command, result });
+});
+
+// ============== INVENTORY PREDICTION ==============
+
+const inventoryRouter = require('./src/services/inventoryPrediction');
+app.use('/api/inventory', inventoryRouter);
+
+// ============== STAFF SCHEDULING ==============
+
+const staffRouter = require('./src/services/staffScheduling');
+app.use('/api/staff', staffRouter);
+
+// ============== ADMIN DASHBOARD ==============
+
+const adminRouter = require('./src/services/adminDashboard');
+app.use('/api/admin', adminRouter);
+
+// ============== WEBHOOKS ==============
+
+const webhookRouter = require('./src/services/webhooks');
+app.use('/api/webhooks', webhookRouter);
+
 // Health
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'REZ Business AI', port: PORT, timestamp: new Date().toISOString() });
