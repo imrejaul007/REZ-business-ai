@@ -164,6 +164,90 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'REZ Business AI', port: PORT, timestamp: new Date().toISOString() });
 });
 
+// ============== INTEGRATION HUB ==============
+
+const { Intelligence, RABTUL, Media, CorpPerks, CampaignExecutor, SERVICES } = require('./src/services/integrationHub');
+
+// Get all connected services status
+app.get('/api/integration/status', (req, res) => {
+  res.json({
+    services: Object.keys(SERVICES).map(name => ({
+      name,
+      url: SERVICES[name].url,
+      connected: true,
+    })),
+  });
+});
+
+// Intelligence endpoints
+app.get('/api/intelligence/signals/:merchantId', async (req, res) => {
+  const signals = await Intelligence.getSignals(req.params.merchantId);
+  res.json(signals);
+});
+
+app.get('/api/intelligence/demand', async (req, res) => {
+  const demand = await Intelligence.getDemand(req.query);
+  res.json(demand);
+});
+
+app.get('/api/intelligence/churn/:customerId', async (req, res) => {
+  const churn = await Intelligence.getChurnRisk(req.params.customerId);
+  res.json(churn);
+});
+
+// RABTUL endpoints
+app.post('/api/rabtul/notify', async (req, res) => {
+  const result = await RABTUL.sendNotification(req.body);
+  res.json(result);
+});
+
+app.post('/api/rabtul/wallet/credit', async (req, res) => {
+  const result = await RABTUL.creditWallet(req.body);
+  res.json(result);
+});
+
+app.post('/api/rabtul/coupon', async (req, res) => {
+  const result = await RABTUL.createCoupon(req.body);
+  res.json(result);
+});
+
+// Media endpoints
+app.post('/api/media/campaign', async (req, res) => {
+  const result = await Media.createCampaign(req.body);
+  res.json(result);
+});
+
+app.post('/api/media/ad', async (req, res) => {
+  const result = await Media.launchAd(req.body);
+  res.json(result);
+});
+
+app.post('/api/media/qr/track', async (req, res) => {
+  const result = await Media.trackQR(req.body);
+  res.json(result);
+});
+
+// CorpPerks endpoints
+app.get('/api/corpperks/identify', async (req, res) => {
+  const result = await CorpPerks.identifyCorporate(req.query.email);
+  res.json(result);
+});
+
+app.post('/api/corpperks/b2b-deal', async (req, res) => {
+  const result = await CorpPerks.createB2BDeal(req.body);
+  res.json(result);
+});
+
+// Complete campaign execution
+app.post('/api/campaign/execute', async (req, res) => {
+  try {
+    const result = await CampaignExecutor.execute(req.body);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ML Predictions
 app.get('/api/predict/demand', (req, res) => {
   const { dayOfWeek, timeOfDay, weather, event, historical } = req.query;
